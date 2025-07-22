@@ -242,7 +242,7 @@ export class DefaultSyncService extends CoreSyncService {
     await this.accountService.setAccountVerifyNewDeviceLogin(response.id, response.verifyDevices);
 
     await this.billingAccountProfileStateService.setHasPremium(
-      response.premiumPersonally,
+      true, // response.premiumPersonally,
       response.premiumFromOrganization,
       response.id,
     );

@@ -245,7 +245,7 @@ export abstract class LoginStrategy {
     );
 
     await this.billingAccountProfileStateService.setHasPremium(
-      accountInformation.premium ?? false,
+      true, // accountInformation.premium ?? false,
       false,
       userId,
     );

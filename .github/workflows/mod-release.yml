@@ -1,0 +1,51 @@
+name: Mod Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: mod # Checkout the mod-new branch
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Chrome extension
+        run: |
+          cd apps/browser
+          npm run build
+
+      - name: Package
+        uses: cardinalby/webext-buildtools-pack-extension-dir-action@v1
+        with:
+          extensionDir: 'apps/browser/build'
+          zipFilePath: 'bitwarden-mod.zip'
+
+      - uses: cardinalby/webext-buildtools-chrome-crx-action@v2
+        with:
+          # zip file made at the packExtensionDir step
+          zipFilePath: 'bitwarden-mod.zip'
+          crxFilePath: 'bitwarden-mod.crx'
+          privateKey: ${{ secrets.CHROME_CRX_PRIVATE_KEY }}
+          # The following is optional if you need update.xml file
+          #updateXmlPath: 'build/update.xml'
+          #updateXmlCodebaseUrl: 'https://server.com/extension.crx'
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          draft: false
+          files: bitwarden-mod.crx
+          generate_release_notes: true
